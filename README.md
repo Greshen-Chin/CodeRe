@@ -1,1 +1,1 @@
-# CodeRe
+# JavaProject berisi game merupakan code yang belum di perbaiki alias belum mengalaqmi fase code reeinggenering
