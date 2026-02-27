@@ -4,11 +4,18 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
+/* * [SMELL: Large Class] 
+ * Kelas ini menangani terlalu banyak hal (Gacha, Battle, Stats, Menu) sehingga menjadi "God Object"[cite: 105].
+ */
 public class Game {
 
     static Scanner sc = new Scanner(System.in);
     static Random rand = new Random();
 
+    /* * [SMELL: Primitive Obsession] 
+     * Menggunakan tipe data primitif secara berlebihan untuk data kompleks (Player Stats) 
+     * yang seharusnya dibungkus dalam objek[cite: 106].
+     */
     static String mcName;
     static int coin = 350;
     static int energy = 100;
@@ -26,10 +33,18 @@ public class Game {
     static int grockHp;
     static int grockHealCd;
 
+    /* * SMELL: Temporary Field
+     * Variabel musuh ini hanya digunakan saat pertempuran tetapi dideklarasikan sebagai 
+     * variabel global kelas.
+     */
     static boolean enemyStunned;
     static boolean enemyBurn;
     static int enemyBurnTurn;
 
+    /* * SMELL: Inappropriate Intimacy
+     * Semua metode memiliki akses tanpa batas untuk mengubah data statis secara langsung 
+     * tanpa enkapsulasi.
+     */
     static ArrayList<String> owned = new ArrayList<>();
     static ArrayList<String> party = new ArrayList<>();
 
@@ -66,6 +81,9 @@ public class Game {
         }
     }
 
+    /* * SMELL: Shotgun Surgery
+     * Menambah satu karakter baru memaksa kita mengubah banyak tempat (metode gacha dan fight).
+     */
     static void gacha() {
         if (coin < 500) return;
 
@@ -125,6 +143,9 @@ public class Game {
         }
     }
 
+    /* * SMELL: Divergent Change 
+     * Metode ini sering berubah karena berbagai alasan (sistem energi, koin, atau leveling).
+     */
     static void playStage() {
 
         System.out.print("Stage 1-4: ");
@@ -138,7 +159,7 @@ public class Game {
         resetPlayer();
 
         for (int level = 1; level <= 10; level++) {
-
+            /* SMELL: Duplicate Code Logika heal berulang di beberapa tempat. */
             mcHp = Math.min(mcMaxHp, mcHp + 30);
 
             boolean boss = level == 3 || level == 7 || level == 10;
@@ -159,6 +180,7 @@ public class Game {
         System.out.println("Stage cleared");
     }
 
+    /* SMELL: Data Class tendency Hanya berisi kumpulan data statis tanpa enkapsulasi. */
     static void resetPlayer() {
         mcMaxHp = 100 + mcLevel * 10;
         mcHp = mcMaxHp;
@@ -169,6 +191,9 @@ public class Game {
         grockHealCd = 0;
     }
 
+    /* * SMELL: Long Method
+     * Metode ini terlalu panjang dan menangani terlalu banyak logika pertempuran sekaligus.
+     */
     static boolean fight(int stage, String diff, boolean boss) {
 
         int enemyHp = diff.equals("EASY") ? 50 : diff.equals("MEDIUM") ? 90 : 140;
@@ -188,6 +213,9 @@ public class Game {
             for (String c : party) {
                 if (enemyHp <= 0) break;
 
+                /* * SMELL: Switch Statement / if-else berdasarkan string
+                 * Pengecekan karakter dengan string melanggar prinsip polimorfisme.
+                 */
                 if (c.equals("MC")) {
                     System.out.println("1 Attack 2 Rescue");
                     int m = sc.nextInt();
@@ -199,7 +227,6 @@ public class Game {
                         mcBuffTurn = 3;
                     }
                 }
-
                 else if (c.equals("Grock")) {
                     System.out.println("1 Attack 2 Heal");
                     int g = sc.nextInt();
@@ -209,19 +236,15 @@ public class Game {
                         grockHealCd = 3;
                     }
                 }
-
                 else if (c.equals("Patrick")) {
                     mcHp = Math.min(mcMaxHp, mcHp + 20);
                 }
-
                 else if (c.equals("Spongebob")) {
                     enemyStunned = true;
                 }
-
                 else if (c.equals("Squidward")) {
                     enemyHp -= 25;
                 }
-
                 else if (c.equals("Saber")) {
                     System.out.println("1 Attack 2 Kill");
                     int s = sc.nextInt();
@@ -242,9 +265,7 @@ public class Game {
             if (enemyHp > 0 && !enemyStunned) {
 
                 int dmg = enemyAtk;
-
                 boolean rage = boss && enemyHp < 80;
-
                 if (rage) dmg += 15;
 
                 int roll = rand.nextInt(100);
